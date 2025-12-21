@@ -23,7 +23,7 @@ const [userName, setUserName] = useState<string | null>(null);
 const [loading, setLoading] = useState(true);
 
 
-useEffect(() => {
+    useEffect(() => {
     const auth = localStorage.getItem("auth") === "true";
     setUserLoginAuth(auth)
     setLoading(false);
