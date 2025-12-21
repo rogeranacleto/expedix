@@ -1,12 +1,16 @@
 import { createBrowserRouter } from "react-router";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
-import { Home } from "./pages/Home";
+import { Admin } from "./pages/Admin";
 import { Layout } from "./Layout";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { NotFound } from "./pages/NotFound";
-
+import { Home } from "./pages/Home";
 const router = createBrowserRouter([
+  {
+    element: <Home/>,
+    path: "/"
+  },
   {
     element: <Login/>,
     path: "/login"
@@ -22,8 +26,8 @@ const router = createBrowserRouter([
         element: <Layout/>,
         children:[
           {
-            element: <Home/>,
-            path: "/"
+            element: <Admin/>,
+            path: "/admin"
           }
         ]
       }
