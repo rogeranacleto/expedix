@@ -1,6 +1,6 @@
 import { createContext, type ReactNode } from "react";
 import { useState } from "react";
-import { type DataProps } from "../pages/Home";
+import { type DataProps } from "../pages/Admin";
 
 interface UpdateProps{
     records: DataProps | null;
