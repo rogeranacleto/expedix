@@ -29,7 +29,7 @@ await signInWithEmailAndPassword(auth, email, password)
     </div>
     )
     login(userLoginDetail)
-    navigate("/")
+    navigate("/admin")
 
 })
 .catch(() => {
