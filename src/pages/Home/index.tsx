@@ -1,171 +1,236 @@
-import { IoAdd } from "react-icons/io5";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { RxPencil1 } from "react-icons/rx";
-import { FaLocationArrow } from "react-icons/fa6";
-import { ModalForm } from "../../components/ModalForm";
-import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { Link } from "react-router";
+import { HeaderHome } from "../../components/HeaderHome";
+import bgExpedix from "../../assets/bg-expedix.png";
+import { MdOutlineDashboard } from "react-icons/md";
+import { FooterHome } from "../../components/FooterHome";
 import { useEffect } from "react";
-import { onSnapshot, collection } from "firebase/firestore";
-import { db } from "../../services/firebaseConnection";
-import { deleteDoc } from "firebase/firestore";
-import { doc } from "firebase/firestore";
-import { ModalUpdate } from "../../components/ModalUpdate";
-import { useContext } from "react";
-import { UpdateContext } from "../../contexts/UpdateContext";
-import toast from "react-hot-toast";
-import { AuthContext } from "../../contexts/AuthContext";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../services/firebaseConnection";
-export interface DataProps {
-  name: string;
-  id: string;
-  telephone: string;
-  city: string;
-  date: string;
-  time: string;
-  dispatcher: string;
-  observations: string;
-}
+import { FaTools } from "react-icons/fa";
+import { RiFolderCloseFill } from "react-icons/ri";
+import { FaRegCalendarCheck } from "react-icons/fa";
+import "aos/dist/aos.css";
+import AOS from "aos";
 
-export function Home(){
-const { userName, getUserName } = useContext(AuthContext);
-const { changeUpdateModal } = useContext(UpdateContext)
-const [openModal, setOpenModal] = useState(false);
-const [openModalUpdate, setOpenModalUpdate] = useState(false)
-const [records, setRecords] = useState<DataProps[]>([]);
-const [search, setSearch] = useState("");
-
-useEffect(() => {
-    async function loadReacords(){
-        const unsub = onSnapshot(collection(db, "records"),(snapshot) => {
-            let listRecords: DataProps[] = [];
-            snapshot.forEach((doc) => {
-                listRecords.push({
-                    id: doc.id,
-                    city: doc.data().city,
-                    date: doc.data().date,
-                    dispatcher: doc.data().dispatcher,
-                    name: doc.data().name,
-                    telephone: doc.data().telephone,
-                    time: doc.data().time,
-                    observations: doc.data().observations,
-                })
-            })
-            setRecords(listRecords)
-        })
-    }
-    loadReacords()
-},[])
-
-useEffect(() => {
-    async function checkLogin(){
-        onAuthStateChanged(auth, (user) => {
-            if(user?.displayName){
-                getUserName(user?.displayName)
-            }
-        })
-    }
-    checkLogin()
-},[])
-
-
-const filteredRecords = records.filter((item) => {
-    const fullText = Object.values(item).join(" ").toLowerCase();
-    const normalizedSearch = search.toLowerCase();
-    return fullText.includes(normalizedSearch);
-});
-                            
-function changeModal(){
-    setOpenModal(true)
-}
-
-async function deleteRecord(id: string){
-    const docRef = doc(db, "records", id)
-    await deleteDoc(docRef)
-    .then(() => {
-        toast.success(
-            <div>
-                <h2 className="text-white font-bold text-sm">Registro Deletado</h2>
-                <p className="text-gray-100/60 text-sm">O registro foi deletado com sucesso.</p>
-            </div>
-        )
-    })
-    .catch((error) => {
-        alert(error)
-    })
-}
-
-function openUpdateModal(register: DataProps){
-    changeUpdateModal(register)
-    setOpenModalUpdate(true)
-}
-
-    return(
-        <div>
-            <AnimatePresence>
-                {openModal && (<ModalForm onClose={() => setOpenModal(false)}/>)}
-            </AnimatePresence>
-            <AnimatePresence>
-                {openModalUpdate && (<ModalUpdate onCloseModal={() => setOpenModalUpdate(false)}/>)}
-            </AnimatePresence>
-
-            <main className="flex flex-col ml-8 mr-8">
-                <section className="relative flex justify-between">
-                    <input type="text" placeholder="Pesquisar registros" className="border border-solid border-gray-100/20 text-gray-100 text-sm p-3.5 rounded-3xl bg-[#020817] w-100 pl-17 focus:border-green-100/40 outline-none" value={search} onChange={(e) => setSearch(e.target.value)}/>
-                        <FaLocationArrow className="text-[#6F5AF5] absolute text-2xl top-3.5 left-5"/>
-                    <div>
-                        <p className="text-white">{userName}</p>
-                    </div>
-                </section>
-                <section className="w-full bg-[#020817] h-40 flex items-center justify-between border border-solid border-gray-100/20 rounded-lg mt-13">
-                    <div className="ml-7.5">
-                        <p className="text-white text-3xl">Adicionar Novo Registro</p>
-                        <p className="text-gray-100/60 mt-2.5">Adicione um novo registro para controlar sua expedição.</p>
-                    </div>
-                    <button className="bg-[#6f5af5d7] duration-500 ease-in-out cursor-pointer p-2 rounded-full mr-7.5 border border-solid border-gray-100/20 text-white hover:bg-[#6F5AF5] hover:brightness-125" onClick={() => changeModal()}>
-                        <IoAdd className="text-4xl"/>
-                    </button>
-                </section>
-                <section className="mt-5 border border-solid border-gray-100/20 w-full rounded-lg bg-[#020817] overflow-x-auto">
-                    <div className="ml-7.5 mt-5 mb-5">
-                        <p className="text-white text-3xl">Resumo de Expedição</p>
-                        <p className="text-gray-100/60 mt-2.5">Atualmente você possui {records.length} registros na sua tabela.</p>
-                    </div>
-                        <table className="w-full border-collapse min-w-max text-left">
-                            <thead className="">
-                                <tr className="text-gray-100/40 text-sm">
-                                    <th className="border-b border-gray-100/20 text-left pt-3.5 pb-3.5 pl-7.5">Nome</th>
-                                    <th className="border-b border-gray-100/20 text-left pt-3.5 pb-3.5 pl-7.5">Telefone</th>
-                                    <th className="border-b border-gray-100/20 text-left pt-3.5 pb-3.5 pl-7.5">Cidade</th>
-                                    <th className="border-b border-gray-100/20 text-left pt-3.5 pb-3.5 pl-7.5">Data retirada</th>
-                                    <th className="border-b border-gray-100/20 text-left pt-3.5 pb-3.5 pl-7.5">Hora retirada</th>
-                                    <th className="border-b border-gray-100/20 text-left pt-3.5 pb-3.5 pl-7.5">Expedidor</th>
-                                    <th className="border-b border-gray-100/20 text-left pt-3.5 pb-3.5 pl-7.5">Ações</th>
-                                </tr>
-                            </thead>
-                            
-                            <tbody className="text-gray-100 w-full text-sm">
-                            {filteredRecords.map((register) => (
-                                <tr className="border-b rounded-lg border-gray-100/20 text-left pt-3.5 pb-3.5 pl-7.5">
-                                    <td className="p-7.5 break-words whitespace-normal">{register.name}</td>
-                                    <td className="p-7.5 break-words whitespace-normal">{register.telephone}</td>
-                                    <td className="p-7.5 break-words whitespace-normal">{register.city}</td>
-                                    <td className="p-7.5 break-words whitespace-normal">{register.date}</td>
-                                    <td className="p-7.5 break-words whitespace-normal">{register.time}</td>
-                                    <td className="p-7.5 break-words whitespace-normal">{register.dispatcher}</td>
-                                    <td className="flex gap-6 items-center p-7.5">
-                                        <button className="cursor-pointer" onClick={() => openUpdateModal(register)}><RxPencil1/></button>
-                                        <button className="cursor-pointer" onClick={() => deleteRecord(register.id)}><FaRegTrashAlt/></button>
-                                    </td>
-                                   
-                                </tr>
-                             ))}
-                            </tbody>
-
-                        </table>
-                </section>
-            </main>
+export function Home() {
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 50,
+    });
+  }, []);
+  return (
+    <div className="max-w-screen w-full min-h-screen bg-[#020817]">
+      <header
+        className="flex items-center justify-center"
+        data-aos="fade-up"
+        data-aos-duration="2000"
+      >
+        <HeaderHome />
+      </header>
+      <section className="max-w-screen flex flex-col items-center justify-center mb-40">
+        <div
+          className="max-w-4xl flex flex-col items-center justify-center mt-15"
+          data-aos="fade-up"
+          data-aos-duration="2200"
+        >
+          <h2 className="text-white font-bold text-5xl mb-7 text-center">
+            Controle sua expedição <br /> de forma rápida e eficiente
+          </h2>
+          <p className="text-gray-500 text-center mb-10">
+            Registre, acompanhe e gerencie retiradas de mercadorias em um único
+            lugar. Tenha tudo <br/> organizado, visualize informações importantes e
+            mantenha o histórico completo <br/> de cada operação logística.
+          </p>
+          <Link to={"signup"}>
+            <button className="text-sm bg-[#6F5AF5] pt-4 pb-4 pl-6 pr-6 font-medium text-black cursor-pointer rounded-sm hover:scale-105 border hover:border-[#6F5AF5] hover:border-solid hover:text-[#6F5AF5 duration-300 ease-in-out">
+              Começar a Utilizar
+            </button>
+          </Link>
         </div>
-    )
+        <div data-aos="fade-up" data-aos-duration="2400" id="app">
+          <img
+            src={bgExpedix}
+            alt="Background PrevSystem"
+            className="mt-25 max-w-4xl w-full block rounded-2xl border border-solid border-[#171717] shadow-2xl"
+          />
+        </div>
+      </section>
+      <section
+        className="max-w-screen flex items-center justify-center mb-40"
+        id="proposal"
+      >
+        <div className="flex flex-col items-center justify-center max-w-4xl">
+          <div className="max-w-4xl flex items-center flex-col">
+            <h2
+              className="text-white text-4xl max-w-2xl text-center font-bold"
+              data-aos="fade-up"
+              data-aos-duration="3000"
+            >
+              Problemas que alguns setores de expedição possuem.
+            </h2>
+            <p
+              className="text-gray-500 mt-5 text-center leading-7"
+              data-aos="fade-up"
+              data-aos-duration="2800"
+            >
+              Sem um sistema de controle, as retiradas de mercadorias ficam
+              desorganizadas e difíceis de acompanhar. O registro manual aumenta
+              erros, duplicidades e dados incompletos. Consultar informações
+              antigas se torna lento e trabalhoso. Além disso, é difícil
+              identificar responsáveis por cada retirada, comprometendo a
+              rastreabilidade e a segurança logística.
+            </p>
+          </div>
+          <div className="flex flex-wrap mt-15 items-center justify-center gap-9">
+            <div data-aos="zoom-in" data-aos-duration="2700">
+              <div className="max-w-sm bg-white rounded-lg p-10 h-80 hover:scale-105 duration-300 ease-in-out border border-solid border-gray-400/20 hover:border-[#3a0eb6]">
+                <div className="bg-white border border-solid border-[#f80808] w-13 h-13 flex items-center justify-center rounded-full">
+                  <MdOutlineDashboard className="text-2xl text-[#f80808]" />
+                </div>
+                <p className="font-bold text-lg mt-5 text-black">
+                  Falta de Controle das Retiradas
+                </p>
+                <p className="mt-5 text-black">
+                  Sem um sistema centralizado, o controle das retiradas fica
+                  desorganizado, dificultando saber quem retirou mercadorias e
+                  em qual momento.
+                </p>
+              </div>
+            </div>
+            <div data-aos="zoom-in" data-aos-duration="2500">
+              <div className="max-w-sm bg-white rounded-lg p-10 h-80 hover:scale-105 duration-300 ease-in-out border border-solid border-gray-400/20 hover:border-[#3a0eb6]">
+                <div className="bg-white border border-solid border-[#f80808] w-13 h-13 flex items-center justify-center rounded-full">
+                  <FaTools className="text-2xl text-[#f80808]" />
+                </div>
+                <p className="font-bold text-lg mt-5 text-black">
+                  Informações Inconsistentes
+                </p>
+                <p className="mt-5 text-black">
+                  O preenchimento manual aumenta a chance de informações
+                  incorretas, incompletas ou duplicadas, comprometendo a
+                  confiabilidade dos dados.
+                </p>
+              </div>
+            </div>
+            <div data-aos="zoom-in" data-aos-duration="2300">
+              <div className="max-w-sm bg-white rounded-lg p-10 h-80 hover:scale-105 duration-300 ease-in-out border border-solid border-gray-400/20 hover:border-[#3a0eb6]">
+                <div className="bg-white border border-solid border-[#f80808] w-13 h-13 flex items-center justify-center rounded-full">
+                  <FaRegCalendarCheck className="text-2xl text-[#f80808]" />
+                </div>
+                <p className="font-bold text-lg mt-5 text-black">
+                  Dificuldade de Consulta
+                </p>
+                <p className="mt-5 text-black">
+                  Buscar registros antigos torna-se demorado e ineficiente,
+                  atrasando processos e decisões no dia a dia.
+                </p>
+              </div>
+            </div>
+            <div data-aos="zoom-in" data-aos-duration="2100">
+              <div className="max-w-sm bg-white rounded-lg p-10 h-80 hover:scale-105 duration-300 ease-in-out border border-solid border-gray-400/20 hover:border-[#3a0eb6]">
+                <div className="bg-white border border-solid border-[#f80808] w-13 h-13 flex items-center justify-center rounded-full">
+                  <RiFolderCloseFill className="text-2xl text-[#f80808]" />
+                </div>
+                <p className="font-bold text-lg mt-5 text-black">
+                  Falta de Rastreabilidade
+                </p>
+                <p className="mt-5 text-black">
+                  Sem histórico organizado, é difícil identificar responsáveis
+                  pelas retiradas, o que pode gerar falhas no controle e perdas
+                  logísticas.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section
+        className="max-w-screen flex items-center justify-center"
+        id="proposal"
+      >
+        <div className="flex flex-col items-center justify-center max-w-4xl">
+          <div className="max-w-4xl flex items-center flex-col" id="about">
+            <h2
+              className="text-white text-4xl text-center font-bold"
+              data-aos="fade-up"
+              data-aos-duration="3000"
+            >
+              Qual a solução da plataforma?
+            </h2>
+            <p
+              className="text-gray-500 mt-5 text-center leading-7"
+              data-aos="fade-up"
+              data-aos-duration="2800"
+            >
+              O sistema centraliza todas as retiradas em um só lugar, garantindo
+              organização. Os registros são padronizados, reduzindo erros e
+              dados inconsistentes. A consulta é rápida e prática, agilizando
+              processos. Além disso, o histórico completo permite identificar
+              responsáveis e aumentar a rastreabilidade.
+            </p>
+          </div>
+          <div className="flex flex-wrap mt-15 items-center justify-center gap-9">
+            <div data-aos="zoom-in" data-aos-duration="2700">
+              <div className="max-w-sm bg-white rounded-lg p-10 h-80 hover:scale-105 duration-300 ease-in-out border border-solid border-gray-400/20 hover:border-[#3a0eb6]">
+                <div className="bg-white border border-solid border-[#6F5AF5] w-13 h-13 flex items-center justify-center rounded-full">
+                  <MdOutlineDashboard className="text-2xl text-[#6F5AF5]" />
+                </div>
+                <p className="font-bold text-lg mt-5 text-black">
+                  Controle Centralizado
+                </p>
+                <p className="mt-5 text-black">
+                  O sistema reúne todas as informações de expedição em uma única
+                  plataforma, garantindo organização e fácil acompanhamento das
+                  retiradas.
+                </p>
+              </div>
+            </div>
+            <div data-aos="zoom-in" data-aos-duration="2500">
+              <div className="max-w-sm bg-white rounded-lg p-10 h-80 hover:scale-105 duration-300 ease-in-out border border-solid border-gray-400/20 hover:border-[#3a0eb6]">
+                <div className="bg-white border border-solid border-[#6F5AF5] w-13 h-13 flex items-center justify-center rounded-full">
+                  <FaTools className="text-2xl text-[#6F5AF5]" />
+                </div>
+                <p className="font-bold text-lg mt-5 text-black">
+                  Dados Confiáveis
+                </p>
+                <p className="mt-5 text-black">
+                  Com formulários estruturados, o sistema reduz erros de
+                  preenchimento e mantém dados consistentes e precisos.
+                </p>
+              </div>
+            </div>
+            <div data-aos="zoom-in" data-aos-duration="2300">
+              <div className="max-w-sm bg-white rounded-lg p-10 h-80 hover:scale-105 duration-300 ease-in-out border border-solid border-gray-400/20 hover:border-[#3a0eb6]">
+                <div className="bg-white border border-solid border-[#6F5AF5] w-13 h-13 flex items-center justify-center rounded-full">
+                  <FaRegCalendarCheck className="text-2xl text-[#6F5AF5]" />
+                </div>
+                <p className="font-bold text-lg mt-5 text-black">
+                  Consulta Rápida
+                </p>
+                <p className="mt-5 text-black">
+                  A tabela organizada permite localizar registros de forma
+                  rápida, agilizando processos e tomadas de decisão.
+                </p>
+              </div>
+            </div>
+            <div data-aos="zoom-in" data-aos-duration="2100">
+              <div className="max-w-sm bg-white rounded-lg p-10 h-80 hover:scale-105 duration-300 ease-in-out border border-solid border-gray-400/20 hover:border-[#3a0eb6]">
+                <div className="bg-white border border-solid border-[#6F5AF5] w-13 h-13 flex items-center justify-center rounded-full">
+                  <RiFolderCloseFill className="text-2xl text-[#6F5AF5]" />
+                </div>
+                <p className="font-bold text-lg mt-5 text-black">
+                  Rastreabilidade
+                </p>
+                <p className="mt-5 text-black">
+                  O sistema mantém o histórico completo das retiradas,
+                  facilitando a identificação dos responsáveis.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <FooterHome />
+    </div>
+  );
 }
