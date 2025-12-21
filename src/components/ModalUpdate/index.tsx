@@ -6,7 +6,7 @@ import { doc } from "firebase/firestore";
 import { useState } from "react";
 import { useContext } from "react";
 import { UpdateContext } from "../../contexts/UpdateContext";
-import type { DataProps } from "../../pages/Home";
+import type { DataProps } from "../../pages/Admin";
 import toast from "react-hot-toast";
 
 interface ChangeModalUpdate {
