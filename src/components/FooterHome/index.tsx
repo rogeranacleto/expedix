@@ -9,7 +9,7 @@ export function FooterHome() {
         data-aos="fade-left"
         data-aos-duration="2300"
       >
-        <h2 className="text-[#ffffff] font-bold max-w-2xl text-4xl">
+        <h2 className="text-[#ffffff] font-medium max-w-2xl text-4xl">
           Venha utilizar a plataforma, sem nenhum custo!
         </h2>
         <p className="text-gray-400 mt-4">
