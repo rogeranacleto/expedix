@@ -33,7 +33,7 @@ export function Home() {
           data-aos="fade-up"
           data-aos-duration="2200"
         >
-          <h2 className="text-white font-bold text-5xl mb-7 text-center">
+          <h2 className="text-white font-medium text-5xl mb-7 text-center">
             Controle sua expedição <br /> de forma rápida e eficiente
           </h2>
           <p className="text-gray-500 text-center mb-10">
@@ -62,7 +62,7 @@ export function Home() {
         <div className="flex flex-col items-center justify-center max-w-4xl">
           <div className="max-w-4xl flex items-center flex-col">
             <h2
-              className="text-white text-4xl max-w-2xl text-center font-bold"
+              className="text-white text-4xl max-w-2xl text-center font-medium"
               data-aos="fade-up"
               data-aos-duration="3000"
             >
@@ -151,7 +151,7 @@ export function Home() {
         <div className="flex flex-col items-center justify-center max-w-4xl">
           <div className="max-w-4xl flex items-center flex-col" id="about">
             <h2
-              className="text-white text-4xl text-center font-bold"
+              className="text-white text-4xl text-center font-medium"
               data-aos="fade-up"
               data-aos-duration="3000"
             >
