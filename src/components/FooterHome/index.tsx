@@ -27,7 +27,7 @@ export function FooterHome() {
         data-aos="fade-right"
         data-aos-duration="2500"
       >
-        <p className="text-white font-bold text-center">
+        <p className="text-white font-bold text-center text-sm">
           Desenvolvido por Roger Anacleto • © 2025 Todos os direitos reservados.
         </p>
         <div className="flex items-center gap-3 mt-2">
